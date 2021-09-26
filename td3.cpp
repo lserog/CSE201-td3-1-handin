@@ -51,7 +51,7 @@ double* remove_from_array(double* array,
                           int &current_size,
                           int &max_size) {
   if (max_size - current_size >= 4) {
-      double* new_array = shrink_array(array, current_size, current_size - 5);
+      double* new_array = shrink_array(array, current_size, max_size - 5);
       max_size -= 5;
       current_size--;
       return new_array;
@@ -68,7 +68,6 @@ bool simulate_projectile(const double magnitude, const double angle,
                          double* &telemetry,
                          int &telemetry_current_size,
                          int &telemetry_max_size) {
-  // YOU CAN MODIFY THIS FUNCTION TO RECORD THE TELEMETRY
 
   bool hit_target, hit_obstacle;
   double v0_x, v0_y, x, y, t;
@@ -96,6 +95,9 @@ bool simulate_projectile(const double magnitude, const double angle,
       y = v0_y * t  - 0.5 * g * t * t;
       x = v0_x * t;
     }
+    telemetry = append_to_array(t, telemetry, telemetry_current_size, telemetry_max_size);
+    telemetry = append_to_array(x, telemetry, telemetry_current_size, telemetry_max_size);
+    telemetry = append_to_array(y, telemetry, telemetry_current_size, telemetry_max_size);
   }
 
   return hit_target;
@@ -107,5 +109,19 @@ void merge_telemetry(double **telemetries,
                      double* &global_telemetry,
                      int &global_telemetry_current_size,
                      int &global_telemetry_max_size) {
-  // IMPLEMENT YOUR FUNCTION HERE
+  for (int i = 0; i < tot_telemetries; i++) {
+      for (int j = 0; j < telemetries_sizes[i]; j++) {
+          global_telemetry = append_to_array(telemetries[i][j], global_telemetry, global_telemetry_current_size, global_telemetry_max_size);
+      }
+  }
+
+  for (int i = 0; i < global_telemetry_current_size; i += 3) {
+      for (int j = i+3; j < global_telemetry_current_size; j += 3) {
+          if (global_telemetry[i] > global_telemetry[j]) {
+              std::swap(global_telemetry[i],global_telemetry[j]);
+              std::swap(global_telemetry[i+1],global_telemetry[j+1]);
+              std::swap(global_telemetry[i+2],global_telemetry[j+2]);
+          }
+      }
+  }
 }
